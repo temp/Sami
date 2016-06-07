@@ -12,6 +12,7 @@
 namespace Sami\Reflection;
 
 use Sami\Project;
+use TokenReflection\Broker;
 
 class ClassReflection extends Reflection
 {
@@ -63,10 +64,14 @@ class ClassReflection extends Reflection
     public function isPhpClass()
     {
         try {
-            $r = new \ReflectionClass($this->name);
 
-            return $r->isInternal();
-        } catch (\ReflectionException $e) {
+            $broker = new Broker(new Broker\Backend\Memory());
+            $broker->processFile($this->getFile());
+
+            $class = $broker->getClass($this->name);
+
+            return $class->isInternal();
+        } catch (\Exception $e) {
             return false;
         }
     }
